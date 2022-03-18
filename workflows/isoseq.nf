@@ -134,7 +134,8 @@ workflow ISOSEQ {
         Channel // --> Prepare gtf value channel for ultra
             .value(file(params.gtf))
             .set { ch_gtf }
-    } else { exit 1, "OPTION ERROR: gtf file not provided or cannot be found" }
+            .ifEmpty { exit 1, "OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set." }
+    }
 
 
     //
@@ -147,7 +148,7 @@ workflow ISOSEQ {
         def chk       = (it[1] =~ /.*\.(chunk\d+)\.bam/)[ 0 ][ 1 ]
         def id_former = it[0].id
         def id_new    = it[0].id + "." + chk
-        return [ [id:id_new, id_former:id_former], it[1] ]
+        return [ [id:id_new, id_former:id_former, single_end:true], it[1] ]
     }
     .set { ch_pbccs_bam_updated }
 
@@ -163,7 +164,7 @@ workflow ISOSEQ {
         PERL_BIOPERL(ULTRA_PIPELINE.out.sam) // Remove remove reads ending with GAP (N) in CIGAR string
     }
     else {
-        MINIMAP2_ALIGN(GSTAMA_POLYACLEANUP.out.out, ch_fasta) // Align read against genome
+        MINIMAP2_ALIGN(GSTAMA_POLYACLEANUP.out.fasta, ch_fasta) // Align read against genome
         PERL_BIOPERL(MINIMAP2_ALIGN.out.paf)               // Remove remove reads ending with GAP (N) in CIGAR string
     }
 
