@@ -6,7 +6,23 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
+This pipeline has been designed to analyse several samples or sequencing runs in the same time. It will detect automatically the bam files and parallelize computation for each of them.
+
+### Input storage tip
+
+To keep the project directory clean, all input file (BAM + PBI + PRIMERS + GENOME) can be stored in a unique folder (eg. data). The pipeline use a regular expression to detect and list the bam files to process.
+
+### Input files
+
+The pipeline expect to find the *subreads.bam accompanied by their index files (*pbi). The index should be provided with raw reads. If not, it could be generated using [PBINDEX](https://pbbam.readthedocs.io/en/latest/tools/pbindex.html).
+The primers and genome reference file have to be in fasta format. Here an example of primers fasta:
+
+```console
+>5p
+TGGATTGATATGTAATACGACTCACTATAG
+>3p
+CGCCTGAGA
+```
 
 ## Samplesheet input
 
@@ -57,10 +73,10 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```console
-nextflow run nf-core/isoseq --input samplesheet.csv --genome GRCh37 -profile docker
+nextflow run nf-core/isoseq --input 'data/' --primers data/primers.fasta --fasta data/Gallus_gallus.GRCg6a.dna.toplevel.fasta --capped --run_cluster -profile singularity
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+This will launch the pipeline with the `singularity` configuration profile. See below for more information about profiles.
 
 Note that the pipeline will create the following files in your working directory:
 
