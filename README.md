@@ -18,13 +18,13 @@
 
 **nf-core/isoseq** is a bioinformatics best-practice analysis pipeline for Isoseq gene annotation with uLTRA and TAMA. Starting from raw isoseq sequencing data, the pipeline:
 
--   Generates the CCS
+- Generates the CCS
 
--   Clean and polish CCS
+- Clean and polish CCS
 
--   Maps CCS and HIFI on the genome
+- Maps CCS and HIFI on the genome
 
--   Define and clean genes models
+- Define and clean genes models
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
@@ -79,10 +79,10 @@ nf-core/isoseq was originally written by Sébastien Guizard.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
--   Richard Kuo for his valuable advice on isoseq analysis
--   The Workpackage 2 of Gene-Switch Project for their fruitful discussions and remarks
--   The Mick Watson group for their support
--   The nf-core community for their help in the developement of this pipeline
+- Richard Kuo for his valuable advice on isoseq analysis
+- The Workpackage 2 of Gene-Switch Project for their fruitful discussions and remarks
+- The Mick Watson group for their support
+- The nf-core community for their help in the developement of this pipeline
 
 This pipeline has been developed as part of the GENE-SWitCH project. This project has received funding from the European Union's Horizon 2020 Research and Innovation Programme under the grant agreement n° 817998.
 
