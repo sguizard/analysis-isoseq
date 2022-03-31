@@ -42,7 +42,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { PERL_BIOPERL }        from '../modules/local/perl/bioperl/main'
 include { GSTAMA_FILELIST }     from '../modules/local/gstama/filelist/main'
-include { GSTAMA_POLYACLEANUP } from '../modules/local/gstama/polyacleanup/main'
+
 
 
 /*
@@ -57,16 +57,17 @@ include { GSTAMA_POLYACLEANUP } from '../modules/local/gstama/polyacleanup/main'
 //include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 //include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 //include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
-include { PBCCS }            from '../modules/nf-core/modules/pbccs/main'
-include { LIMA }             from '../modules/nf-core/modules/lima/main'
-include { ISOSEQ3_REFINE }   from '../modules/nf-core/modules/isoseq3/refine/main'
-include { BAMTOOLS_CONVERT } from '../modules/nf-core/modules/bamtools/convert/main'
-include { MINIMAP2_ALIGN }   from '../modules/nf-core/modules/minimap2/align/main'
-include { ULTRA_PIPELINE }   from '../modules/nf-core/modules/ultra/pipeline/main'
-include { SAMTOOLS_SORT }    from '../modules/nf-core/modules/samtools/sort/main'
-include { GSTAMA_COLLAPSE }  from '../modules/nf-core/modules/gstama/collapse/main'
-include { GSTAMA_MERGE }     from '../modules/nf-core/modules/gstama/merge/main'
-include { MULTIQC }          from '../modules/nf-core/modules/multiqc/main'
+include { PBCCS }               from '../modules/nf-core/modules/pbccs/main'
+include { LIMA }                from '../modules/nf-core/modules/lima/main'
+include { ISOSEQ3_REFINE }      from '../modules/nf-core/modules/isoseq3/refine/main'
+include { BAMTOOLS_CONVERT }    from '../modules/nf-core/modules/bamtools/convert/main'
+include { GSTAMA_POLYACLEANUP } from '../modules/nf-core/modules/gstama/polyacleanup/main'
+include { MINIMAP2_ALIGN }      from '../modules/nf-core/modules/minimap2/align/main'
+include { ULTRA_PIPELINE }      from '../modules/nf-core/modules/ultra/pipeline/main'
+include { SAMTOOLS_SORT }       from '../modules/nf-core/modules/samtools/sort/main'
+include { GSTAMA_COLLAPSE }     from '../modules/nf-core/modules/gstama/collapse/main'
+include { GSTAMA_MERGE }        from '../modules/nf-core/modules/gstama/merge/main'
+include { MULTIQC }             from '../modules/nf-core/modules/multiqc/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
