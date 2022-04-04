@@ -145,8 +145,8 @@ workflow ISOSEQ {
         if (infile.exists()) {
             Channel // --> Prepare gtf value channel for ultra
             .value(file(params.gtf))
-            .ifEmpty { exit 1, "OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set." }
             .set { ch_gtf }
+        }
     }
 
 

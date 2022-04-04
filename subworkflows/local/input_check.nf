@@ -13,7 +13,7 @@ workflow INPUT_CHECK {
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channels(it, chunk) }
+        .flatMap { create_pbccs_channels(it, chunk) }
         .set { reads }
 
     emit:
@@ -22,7 +22,7 @@ workflow INPUT_CHECK {
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channels(LinkedHashMap row, chunk) {
+def create_pbccs_channels(LinkedHashMap row, chunk) {
     def meta = [:]
     meta.id         = row.sample
     meta.single_end = row.single_end.toBoolean()
