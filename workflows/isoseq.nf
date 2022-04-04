@@ -62,6 +62,7 @@ include { LIMA }                from '../modules/nf-core/modules/lima/main'
 include { ISOSEQ3_REFINE }      from '../modules/nf-core/modules/isoseq3/refine/main'
 include { BAMTOOLS_CONVERT }    from '../modules/nf-core/modules/bamtools/convert/main'
 include { GSTAMA_POLYACLEANUP } from '../modules/nf-core/modules/gstama/polyacleanup/main'
+include { GUNZIP }              from '../modules/nf-core/modules/gunzip/main'
 include { MINIMAP2_ALIGN }      from '../modules/nf-core/modules/minimap2/align/main'
 include { ULTRA_PIPELINE }      from '../modules/nf-core/modules/ultra/pipeline/main'
 include { SAMTOOLS_SORT }       from '../modules/nf-core/modules/samtools/sort/main'
@@ -163,7 +164,8 @@ workflow ISOSEQ {
     // Align CCS (no cluster path) or singletons + transcripts (cluster path)
     // User can choose between minimap2 and uLTRA aligners
     if (params.ultra == true) {
-        ULTRA_PIPELINE(GSTAMA_POLYACLEANUP.out.fasta, ch_fasta, ch_gtf)
+        GUNZIP(GSTAMA_POLYACLEANUP.out.fasta)
+        ULTRA_PIPELINE(GUNZIP.out.gunzip, ch_fasta, ch_gtf)
         PERL_BIOPERL(ULTRA_PIPELINE.out.sam) // Remove remove reads ending with GAP (N) in CIGAR string
     }
     else {

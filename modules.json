@@ -21,6 +21,9 @@
             "gstama/polyacleanup": {
                 "git_sha": "794f84534b0b259662199b7f3a67baa3c3ef9b62"
             },
+            "gunzip": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
             "isoseq3/refine": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
