@@ -110,7 +110,9 @@ workflow ISOSEQ {
         .set { ch_pbccs_in }
     } else { exit 1, 'OPTION ERROR: bam/bam.pbi directory not provided or cannot be found!' }
 
+
     n_samples = new File(params.input).listFiles().count { it.name ==~ /.*.bam$/ }
+
 
     Channel // Prepare the pbccs chunk_num channel
         .from((1..params.chunk).step(1).toList()*n_samples)
@@ -134,8 +136,8 @@ workflow ISOSEQ {
     if (params.ultra == true) {
         Channel // --> Prepare gtf value channel for ultra
             .value(file(params.gtf))
-            .set { ch_gtf }
             .ifEmpty { exit 1, "OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set." }
+            .set { ch_gtf }
     }
 
 
