@@ -112,6 +112,7 @@ workflow ISOSEQ {
     if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 
+
     BufferedReader reader = new BufferedReader(new FileReader(params.input));
     int n_samples = 0;
     while (reader.readLine() != null) n_samples++;
@@ -144,8 +145,8 @@ workflow ISOSEQ {
         if (infile.exists()) {
             Channel // --> Prepare gtf value channel for ultra
             .value(file(params.gtf))
+            .ifEmpty { exit 1, "OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set." }
             .set { ch_gtf }
-        } else { exit 1, 'OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set.' }
     }
 
 
