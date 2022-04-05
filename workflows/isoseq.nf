@@ -35,14 +35,13 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-//include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
 // MODULE: Local to the pipeline
 //
-include { PERL_BIOPERL }        from '../modules/local/perl/bioperl/main'
-include { GSTAMA_FILELIST }     from '../modules/local/gstama/filelist/main'
-
+include { PERL_BIOPERL }    from '../modules/local/perl/bioperl/main'
+include { GSTAMA_FILELIST } from '../modules/local/gstama/filelist/main'
 
 
 /*
@@ -86,33 +85,41 @@ workflow ISOSEQ {
 
     ch_versions = Channel.empty()
     // Check if input directory contains bam and pbis files and set up channels
-    if (params.input) {
-        Channel // Check presence of bam files
-        .fromPath(params.input + '/*.bam')
-        .ifEmpty { exit 1, "Cannot find any bam(s) in input directory: ${params.input}\nNB: File names must finish by '.bam'\nNB: Path needs to be enclosed in quotes!" }
-        Channel // Check presence of bam.pbi files
-        .fromPath(params.input + '/*.bam.pbi')
-        .ifEmpty { exit 1, "Cannot find any pbi(s) in input directory: ${params.input}\nNB: File names must finish by '.bam.pbi'\nNB: Path needs to be enclosed in quotes!" }
+//     if (params.input) {
+//         Channel // Check presence of bam files
+//         .fromPath(params.input + '/*.bam')
+//         .ifEmpty { exit 1, "Cannot find any bam(s) in input directory: ${params.input}\nNB: File names must finish by '.bam'\nNB: Path needs to be enclosed in quotes!" }
+//         Channel // Check presence of bam.pbi files
+//         .fromPath(params.input + '/*.bam.pbi')
+//         .ifEmpty { exit 1, "Cannot find any pbi(s) in input directory: ${params.input}\nNB: File names must finish by '.bam.pbi'\nNB: Path needs to be enclosed in quotes!" }
+//
+//         Channel // Prepare channel for bams: duplicates item by num of chunk and extract id
+//         .fromPath(params.input + '/*.bam')
+//         .flatMap {  // Duplicate each samples to match to the number of chunks
+//             def array = []
+//             for ( i = 1 ; i <= params.chunk ; i++ ) { array << it }
+//             return array
+//         }
+//         .map {  // Set channel to [meta, bam, pbi]
+//             [
+//                 [ id:it.toString().replaceAll(/.*\\//, '').replaceAll(/.bam$/, '') ],
+//                 file(it),
+//                 file(it.toString().replaceAll(/.bam$/, '.bam.pbi'))
+//             ]
+//         }
+//         .set { ch_pbccs_in }
+//     } else { exit 1, 'OPTION ERROR: bam/bam.pbi directory not provided or cannot be found!' }
 
-        Channel // Prepare channel for bams: duplicates item by num of chunk and extract id
-        .fromPath(params.input + '/*.bam')
-        .flatMap {  // Duplicate each samples to match to the number of chunks
-            def array = []
-            for ( i = 1 ; i <= params.chunk ; i++ ) { array << it }
-            return array
-        }
-        .map {  // Set channel to [meta, bam, pbi]
-            [
-                [ id:it.toString().replaceAll(/.*\\//, '').replaceAll(/.bam$/, '') ],
-                file(it),
-                file(it.toString().replaceAll(/.bam$/, '.bam.pbi'))
-            ]
-        }
-        .set { ch_pbccs_in }
-    } else { exit 1, 'OPTION ERROR: bam/bam.pbi directory not provided or cannot be found!' }
+    if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 
-    n_samples = new File(params.input).listFiles().count { it.name ==~ /.*.bam$/ }
+
+    BufferedReader reader = new BufferedReader(new FileReader(params.input));
+    int n_samples = 0;
+    while (reader.readLine() != null) n_samples++;
+    n_samples--;
+    reader.close();
+    // n_samples = new File(params.input).listFiles().count { it.name ==~ /.*.bam$/ }
 
 
     Channel // Prepare the pbccs chunk_num channel
@@ -135,17 +142,24 @@ workflow ISOSEQ {
 
 
     if (params.ultra == true) {
-        Channel // --> Prepare gtf value channel for ultra
+        File infile = new File(params.gtf)
+        if (infile.exists()) {
+            Channel // --> Prepare gtf value channel for ultra
             .value(file(params.gtf))
-            .ifEmpty { exit 1, "OPTION ERROR: gtf file not provided or cannot be found: ${params.gtf} \nA gtf file must be provided when --ultra is set." }
             .set { ch_gtf }
+        }
     }
 
 
     //
     // START PIPELINE
     //
-    PBCCS(ch_pbccs_in, ch_chunk_num, params.chunk) // Generate CCS from raw reads
+    INPUT_CHECK(ch_input, params.chunk)
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+
+    INPUT_CHECK.out.reads.subscribe { println("GOT: $it")}
+    //PBCCS(ch_pbccs_in, ch_chunk_num, params.chunk) // Generate CCS from raw reads
+    PBCCS(INPUT_CHECK.out.reads, ch_chunk_num, params.chunk) // Generate CCS from raw reads
 
     PBCCS.out.bam // Update meta, update id (+chunkX) and store former id
     .map {
