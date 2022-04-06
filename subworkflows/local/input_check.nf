@@ -7,12 +7,13 @@ include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
 workflow INPUT_CHECK {
     take:
     samplesheet // file: /path/to/samplesheet.csv
+    chunk // value: integer (number of chunk to create)
 
     main:
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channels(it) }
+        .flatMap { create_pbccs_channels(it, chunk) }
         .set { reads }
 
     emit:
@@ -21,22 +22,23 @@ workflow INPUT_CHECK {
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channels(LinkedHashMap row) {
+def create_pbccs_channels(LinkedHashMap row, chunk) {
     def meta = [:]
-    meta.id           = row.sample
-    meta.single_end   = row.single_end.toBoolean()
+    meta.id         = row.sample
+    meta.single_end = row.single_end.toBoolean()
+
+    if (!file(row.bam).exists()) {
+        exit 1, "ERROR: Please check input samplesheet -> BAM file does not exist!\n${row.bam}"
+    }
+
+    if (!file(row.pbi).exists()) {
+        exit 1, "ERROR: Please check input samplesheet -> PBI file does not exist!\n${row.pbi}"
+    }
 
     def array = []
-    if (!file(row.fastq_1).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
+    for ( i = 1 ; i <= chunk ; i++ ) {
+        array << [ meta, file(row.bam), file(row.pbi) ]
     }
-    if (meta.single_end) {
-        array = [ meta, [ file(row.fastq_1) ] ]
-    } else {
-        if (!file(row.fastq_2).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-        }
-        array = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
-    }
+
     return array
 }
