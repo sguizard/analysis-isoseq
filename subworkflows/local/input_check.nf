@@ -21,7 +21,7 @@ workflow INPUT_CHECK {
     versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
 }
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
+// Function to get to create pbcss channel [ meta, [ bam, pbi ] ]
 def create_pbccs_channels(LinkedHashMap row, chunk) {
     def meta = [:]
     meta.id         = row.sample

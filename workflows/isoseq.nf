@@ -99,12 +99,16 @@ workflow ISOSEQ {
 
 
     if (params.ultra == true) {
-        File infile = new File(params.gtf)
-        if (infile.exists()) {
-            Channel // --> Prepare gtf value channel for ultra
-            .value(file(params.gtf))
-            .set { ch_gtf }
+        // if a path is given and not an url, check file exitence
+        if (!(params.test =~ /^http/)) {
+            File infile = new File(params.gtf)
+            if (infile.exists()) {exit 1, 'OPTION ERROR: gtf file not provided or cannot be found'}
         }
+
+        Channel // --> Prepare gtf value channel for ultra
+        .value(file(params.gtf))
+        .set { ch_gtf }
+
     }
 
 
