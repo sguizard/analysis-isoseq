@@ -45,9 +45,9 @@ class RowChecker:
             sample_col (str): The name of the column that contains the sample name
                 (default "sample").
             first_col (str): The name of the column that contains the first (or only)
-                FASTQ file path (default "bam").
+                BAM file path (default "bam").
             second_col (str): The name of the column that contains the second (if any)
-                FASTQ file path (default "pbi").
+                PBI file path (default "pbi").
             single_col (str): The name of the new column that will be inserted and
                 records whether the sample contains single- or paired-end sequencing
                 reads (default "single_end").
@@ -153,7 +153,7 @@ def check_samplesheet(file_in, file_out):
     Check that the tabular samplesheet has the structure expected by nf-core pipelines.
 
     Validate the general shape of the table, expected columns, and each row. Also add
-    an additional column which records whether one or two FASTQ reads were found.
+    an additional column single_end.
 
     Args:
         file_in (pathlib.Path): The given tabular samplesheet. The format can be either

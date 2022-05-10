@@ -80,54 +80,29 @@ workflow ISOSEQ {
 
     ch_versions = Channel.empty()
 
+    Channel // Prepare value channel for primers used for the library preparation
+        .value(file(params.primers))
+        .set { ch_primers }
 
-    if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-
-
-    if (params.primers) {
-        Channel // Prepare value channel for primers used for the library preparation
-            .value(file(params.primers))
-            .set { ch_primers }
-    } else { exit 1, 'OPTION ERROR: primers file not provided or cannot be found!' }
-
-
-    if (params.fasta) {
-        Channel // Prepare value channel for reference genome fasta file => minimap2/uLTRA
-            .value(file(params.fasta))
-            .set { ch_fasta }
-    } else { exit 1, 'OPTION ERROR: fasta file not provided or cannot be found' }
-
+    Channel // Prepare value channel for reference genome fasta file => minimap2/uLTRA
+        .value(file(params.fasta))
+        .set { ch_fasta }
 
     if (params.ultra == true) {
-        // if a path is given and not an url, check file exitence
-        if (!(params.test =~ /^http/)) {
-            File infile = new File(params.gtf)
-            if (infile.exists()) {exit 1, 'OPTION ERROR: gtf file not provided or cannot be found'}
-        }
-
         Channel // --> Prepare gtf value channel for ultra
         .value(file(params.gtf))
         .set { ch_gtf }
-
     }
 
 
     //
     // START PIPELINE
     //
-    INPUT_CHECK(ch_input, params.chunk)
+    INPUT_CHECK(params.input, params.chunk)
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    INPUT_CHECK.out.reads.subscribe { println("GOT: $it")}
-
     SET_CHUNK_NUM_CHANNEL(params.input, params.chunk)
-//    Channel // Prepare the pbccs chunk_num channel
-//        .from((1..params.chunk).step(1).toList()*INPUT_CHECK.out.nsamples)
-//        .set { ch_chunk_num }
-
-//    PBCCS(INPUT_CHECK.out.reads, ch_chunk_num, params.chunk) // Generate CCS from raw reads
     PBCCS(INPUT_CHECK.out.reads, SET_CHUNK_NUM_CHANNEL.out.chunk_num, params.chunk) // Generate CCS from raw reads
-
     PBCCS.out.bam // Update meta, update id (+chunkX) and store former id
     .map {
         def chk       = (it[1] =~ /.*\.(chunk\d+)\.bam/)[ 0 ][ 1 ]
@@ -227,7 +202,7 @@ workflow ISOSEQ {
     ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-//  ch_multiqc_files = ch_multiqc_files.mix(PBCCS.out.report_json.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(PBCCS.out.report_json.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(LIMA.out.summary.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(LIMA.out.counts.collect{it[1]}.ifEmpty([]))
 //  ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
