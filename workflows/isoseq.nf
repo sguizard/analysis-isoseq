@@ -31,8 +31,11 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK }           from '../subworkflows/local/input_check'
-include { SET_CHUNK_NUM_CHANNEL } from '../subworkflows/local/set_chunk_num_channel'
+include { INPUT_CHECK }                              from '../subworkflows/local/input_check'
+include { SET_CHUNK_NUM_CHANNEL }                    from '../subworkflows/local/set_chunk_num_channel'
+include { SET_VALUE_CHANNEL as SET_FASTA_CHANNEL }   from '../subworkflows/local/set_value_channel'
+include { SET_VALUE_CHANNEL as SET_GTF_CHANNEL }     from '../subworkflows/local/set_value_channel'
+include { SET_VALUE_CHANNEL as SET_PRIMERS_CHANNEL } from '../subworkflows/local/set_value_channel'
 
 //
 // MODULE: Local to the pipeline
@@ -75,35 +78,25 @@ def multiqc_report = []
 
 workflow ISOSEQ {
     //
-    // SET UP CHANNELS
+    // SET UP VERSIONS CHANNELS
     //
-
     ch_versions = Channel.empty()
-
-    Channel // Prepare value channel for primers used for the library preparation
-        .value(file(params.primers))
-        .set { ch_primers }
-
-    Channel // Prepare value channel for reference genome fasta file => minimap2/uLTRA
-        .value(file(params.fasta))
-        .set { ch_fasta }
-
-    if (params.ultra == true) {
-        Channel // --> Prepare gtf value channel for ultra
-        .value(file(params.gtf))
-        .set { ch_gtf }
-    }
 
 
     //
     // START PIPELINE
     //
-    INPUT_CHECK(params.input, params.chunk)
+    INPUT_CHECK(params.input, params.chunk) // Check samplesheet input for PBCCS module
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    SET_CHUNK_NUM_CHANNEL(params.input, params.chunk)
+    SET_CHUNK_NUM_CHANNEL(params.input, params.chunk) // Prepare channels for:
+    SET_FASTA_CHANNEL(params.fasta)                   // - genome fasta
+    SET_GTF_CHANNEL(params.gtf)                       // - primers fasta
+    SET_PRIMERS_CHANNEL(params.primers)               // - genome gtf
+                                                      // - PBCCS parallelization
+
     PBCCS(INPUT_CHECK.out.reads, SET_CHUNK_NUM_CHANNEL.out.chunk_num, params.chunk) // Generate CCS from raw reads
-    PBCCS.out.bam // Update meta, update id (+chunkX) and store former id
+    PBCCS.out.bam // Update meta: update id (+chunkX) and store former id
     .map {
         def chk       = (it[1] =~ /.*\.(chunk\d+)\.bam/)[ 0 ][ 1 ]
         def id_former = it[0].id
@@ -112,25 +105,24 @@ workflow ISOSEQ {
     }
     .set { ch_pbccs_bam_updated }
 
-    LIMA(ch_pbccs_bam_updated, ch_primers)   // Remove primers from CCS
-    ISOSEQ3_REFINE(LIMA.out.bam, ch_primers) // Discard CCS without polyA tails, remove it from the other
-    BAMTOOLS_CONVERT(ISOSEQ3_REFINE.out.bam)
-    GSTAMA_POLYACLEANUP(BAMTOOLS_CONVERT.out.data)
+    LIMA(ch_pbccs_bam_updated, SET_PRIMERS_CHANNEL.out.data)   // Remove primers from CCS
+    ISOSEQ3_REFINE(LIMA.out.bam, SET_PRIMERS_CHANNEL.out.data) // Discard CCS without polyA tails, remove it from the other
+    BAMTOOLS_CONVERT(ISOSEQ3_REFINE.out.bam)                   // Convert bam to fasta
+    GSTAMA_POLYACLEANUP(BAMTOOLS_CONVERT.out.data)             // Clean polyA tails from reads
 
-    // Align CCS (no cluster path) or singletons + transcripts (cluster path)
-    // User can choose between minimap2 and uLTRA aligners
+    // Align FLNCs: User can choose between minimap2 and uLTRA aligners
     if (params.ultra == true) {
-        GUNZIP(GSTAMA_POLYACLEANUP.out.fasta)
-        ULTRA_PIPELINE(GUNZIP.out.gunzip, ch_fasta, ch_gtf)
-        PERL_BIOPERL(ULTRA_PIPELINE.out.sam) // Remove remove reads ending with GAP (N) in CIGAR string
+        GUNZIP(GSTAMA_POLYACLEANUP.out.fasta)                                                   // uncompress fastas (gz not supported by uLTRA)
+        ULTRA_PIPELINE(GUNZIP.out.gunzip, SET_FASTA_CHANNEL.out.data, SET_GTF_CHANNEL.out.data) // Align read against genome
+        PERL_BIOPERL(ULTRA_PIPELINE.out.sam)                                                    // Remove remove reads ending with GAP (N) in CIGAR string
     }
     else {
-        MINIMAP2_ALIGN(GSTAMA_POLYACLEANUP.out.fasta, ch_fasta) // Align read against genome
-        PERL_BIOPERL(MINIMAP2_ALIGN.out.paf)               // Remove remove reads ending with GAP (N) in CIGAR string
+        MINIMAP2_ALIGN(GSTAMA_POLYACLEANUP.out.fasta, SET_FASTA_CHANNEL.out.data) // Align read against genome
+        PERL_BIOPERL(MINIMAP2_ALIGN.out.paf)                                      // Remove remove reads ending with GAP (N) in CIGAR string
     }
 
-    SAMTOOLS_SORT(PERL_BIOPERL.out.out)   // Sort and convert sam to bam
-    GSTAMA_COLLAPSE(SAMTOOLS_SORT.out.bam, ch_fasta) // Clean gene models
+    SAMTOOLS_SORT(PERL_BIOPERL.out.out)                                // Sort and convert sam to bam
+    GSTAMA_COLLAPSE(SAMTOOLS_SORT.out.bam, SET_FASTA_CHANNEL.out.data) // Clean gene models
 
     GSTAMA_COLLAPSE.out.bed // replace id with the former sample id and group files by sample
         .map { [ [id:it[0].id_former], it[1] ] }
@@ -143,7 +135,7 @@ workflow ISOSEQ {
         .join( GSTAMA_FILELIST.out.tsv )
         .set { ch_tmerge_in }
 
-    GSTAMA_MERGE(ch_tmerge_in.map { [ it[0], it[1] ] }, ch_tmerge_in.map { it[2] }) // Merge bed files from one sample into one
+    GSTAMA_MERGE(ch_tmerge_in.map { [ it[0], it[1] ] }, ch_tmerge_in.map { it[2] }) // Merge all bed files from one sample into a uniq bed file
 
     //
     // MODULE: Pipeline reporting
@@ -172,25 +164,7 @@ workflow ISOSEQ {
         .flatten()
         .collect()
         .set { ch_versions }
-//  //
-//  // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-//  //
-//  INPUT_CHECK (
-//      ch_input
-//  )
-//  ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-//
-//  //
-//  // MODULE: Run FastQC
-//  //
-//  FASTQC (
-//      INPUT_CHECK.out.reads
-//  )
-//  ch_versions = ch_versions.mix(FASTQC.out.versions.first())
-//
-//  CUSTOM_DUMPSOFTWAREVERSIONS (
-//      ch_versions.unique().collectFile(name: 'collated_versions.yml')
-//  )
+
 
     //
     // MODULE: MultiQC
