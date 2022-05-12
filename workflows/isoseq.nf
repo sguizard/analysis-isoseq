@@ -115,6 +115,8 @@ workflow ISOSEQ {
         GUNZIP(GSTAMA_POLYACLEANUP.out.fasta)                                                   // uncompress fastas (gz not supported by uLTRA)
         ULTRA_PIPELINE(GUNZIP.out.gunzip, SET_FASTA_CHANNEL.out.data, SET_GTF_CHANNEL.out.data) // Align read against genome
         PERL_BIOPERL(ULTRA_PIPELINE.out.sam)                                                    // Remove remove reads ending with GAP (N) in CIGAR string
+        // `-> Related to issue https://github.com/ksahlin/ultra/issues/11
+        // `-> Maybe should be removed?
     }
     else {
         MINIMAP2_ALIGN(GSTAMA_POLYACLEANUP.out.fasta, SET_FASTA_CHANNEL.out.data) // Align read against genome
