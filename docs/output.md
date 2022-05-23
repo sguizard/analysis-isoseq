@@ -29,12 +29,13 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <details markdown="1">
 <summary>Output files</summary>
 
+<!-- TODO Write Output files description more general. 70dpf -> e.g. [sample]... -->
 - `01_PBCCS/`
-  - `70dpf_Liver.chunk9.bam`: The CCS sequences
-  - `70dpf_Liver.chunk9.bam.pbi`: The Pacbio index of CCS files
-  - `70dpf_Liver.chunk9.metrics.json.gz`: Statistics for each zmws
-  - `70dpf_Liver.chunk9.report.json`: General statistics about generated CCS sequences in json format
-  - `70dpf_Liver.chunk9.report.txt`: General statistics about generated CCS sequences in txt format
+  - `[sample].chunk[chunkID].bam`: The CCS sequences
+  - `[sample].chunk[chunkID].bam.pbi`: The Pacbio index of CCS files
+  - `[sample].chunk[chunkID].metrics.json.gz`: Statistics for each zmws
+  - `[sample].chunk[chunkID].report.json`: General statistics about generated CCS sequences in json format
+  - `[sample].chunk[chunkID].report.txt`: General statistics about generated CCS sequences in txt format
 
 </details>
 
@@ -45,6 +46,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <details markdown="1">
 <summary>Output files</summary>
 
+<!-- TODO   .bam .bam.pbi and .xml files do not have the correct file name -->
 - `02_LIMA/`
   - `70dpf_Liver.chunk9_flnc.json`: Metadata about generated xml file
   - `70dpf_Liver.chunk9_flnc.lima.clips`: Clipped sequences
@@ -92,6 +94,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 <details markdown="1">
 <summary>Output files</summary>
+
+<!-- TODO Directory name missing - If possible, don't use dots in the directory name-->
 
 - `/`
   - `70dpf_Liver.chunk9_tama.fa`: The polyA tail free reads.
