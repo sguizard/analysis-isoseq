@@ -27,7 +27,7 @@ process GSTAMA_FILELIST {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gstama: \$( tama_merge.py -version | head -n1 )
+        echo: \$( echo --version | head -n1 | sed -e 's/echo (GNU coreutils) //')
     END_VERSIONS
     """
 }
