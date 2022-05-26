@@ -111,7 +111,7 @@ workflow ISOSEQ {
     GSTAMA_POLYACLEANUP(BAMTOOLS_CONVERT.out.data)             // Clean polyA tails from reads
 
     // Align FLNCs: User can choose between minimap2 and uLTRA aligners
-    if (params.ultra == true) {
+    if (params.ultra) {
         GUNZIP(GSTAMA_POLYACLEANUP.out.fasta)                                                   // uncompress fastas (gz not supported by uLTRA)
         ULTRA_PIPELINE(GUNZIP.out.gunzip, SET_FASTA_CHANNEL.out.data, SET_GTF_CHANNEL.out.data) // Align read against genome
         PERL_BIOPERL(ULTRA_PIPELINE.out.sam)                                                    // Remove remove reads ending with GAP (N) in CIGAR string
@@ -160,7 +160,7 @@ workflow ISOSEQ {
     ch_versions = ch_versions.mix(GSTAMA_MERGE.out.versions.first().ifEmpty(null))
     ch_versions = ch_versions.mix(GSTAMA_POLYACLEANUP.out.versions.first().ifEmpty(null))
 
-    if (params.ultra == true) {
+    if (params.ultra) {
         ch_versions = ch_versions.mix(ULTRA_PIPELINE.out.versions.first().ifEmpty(null))
         ch_versions = ch_versions.mix(PERL_BIOPERL.out.versions.first().ifEmpty(null))
     }
