@@ -17,35 +17,35 @@
 
 ## Introduction
 
-**nf-core/isoseq** is a bioinformatics best-practice analysis pipeline for Isoseq gene annotation with uLTRA and TAMA. Starting from raw isoseq sequencing data, the pipeline:
+**nf-core/isoseq** is a bioinformatics best-practice analysis pipeline for Isoseq gene annotation with uLTRA and TAMA. Starting from raw isoseq subreads, the pipeline:
 
 - Generates the CCS
 
-- Clean and polish CCS
+- Clean and polish CCS to create Full Length Non Chimeric (FLNC) reads
 
-- Maps CCS and HIFI on the genome
+- Maps FLNCs on the genome
 
-- Define and clean genes models
+- Define and clean gene models
 
 ![isoseq_pipeline_graph](docs/images/Isoseq_pipeline_V2.1-metro_clean.png)
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
-<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
-
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/isoseq/results).
 
 ## Pipeline summary
 
-1. Generate CCS consensi from raw isoseq reads ([`PBCCS`](https://github.com/PacificBiosciences/ccs))
-2. Remove primers sequences from consensi ([`LIMA`](https://github.com/pacificbiosciences/barcoding/))
-3. Select reads with a polyA tail and removed it from sequence ([`ISOSEQ3 REFINE`](https://github.com/PacificBiosciences/IsoSeq))
+1. Generate CCS consensuses from raw isoseq subreads ([`PBCCS`](https://github.com/PacificBiosciences/ccs))
+2. Remove primer sequences from consensuses ([`LIMA`](https://github.com/pacificbiosciences/barcoding/))
+3. Detect and remove chimeric reads ([`ISOSEQ3 REFINE`](https://github.com/PacificBiosciences/IsoSeq))
 4. Convert bam file into fasta file ([`BAMTOOLS CONVERT`](https://github.com/pezmaster31/bamtools))
-5. Remove remaining polyA tails from reads ([`GSTAMA_POLYACLEANUP`](https://github.com/GenomeRIK/tama))
-6. Map consensi on reference genome ([`MINIMAP2`](https://github.com/lh3/minimap2) or [`uLTRA`](https://github.com/ksahlin/ultra))
-7. Sort sam file and convert bam ([`SAMTOOLS SORT`](http://www.htslib.org/doc/samtools-sort.html))
-8. Clean gene models ([`TAMA collapse`](https://github.com/GenomeRIK/tama))
-9. Merge annotations by sample ([`TAMA merge`](https://github.com/GenomeRIK/tama))
+5. Select reads with a polyA tail and trim it ([`GSTAMA_POLYACLEANUP`](https://github.com/GenomeRIK/tama))
+6. uLTRA path: decompress FLNCs ([`GUNZIP`](https://www.gnu.org/software/gzip/))
+7. Map consensuses on the reference genome ([`MINIMAP2`](https://github.com/lh3/minimap2) or [`uLTRA`](https://github.com/ksahlin/ultra))
+8. uLTRA path remove spurious alignments ([`BIOPERL`](https://bioperl.org/))
+9. Sort sam file and convert bam ([`SAMTOOLS SORT`](http://www.htslib.org/doc/samtools-sort.html))
+10. Clean gene models ([`TAMA collapse`](https://github.com/GenomeRIK/tama))
+11. Merge annotations by sample ([`TAMA merge`](https://github.com/GenomeRIK/tama))
 
 ## Quick Start
 
@@ -69,7 +69,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 4. Start running your own analysis!
 
    ```console
-   nextflow run nf-core/isoseq --input path_to/bam_dir/ --fasta galgal6.fa --primers primers.fa -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run nf-core/isoseq --input samplesheet.csv --fasta <GENOME FASTA> --primers <PRIMER FASTA> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
 ## Documentation
@@ -82,10 +82,12 @@ nf-core/isoseq was originally written by Sébastien Guizard.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-- Richard Kuo for his valuable advice on isoseq analysis
-- The Workpackage 2 of Gene-Switch Project for their fruitful discussions and remarks
+- Richard Kuo ([Wobble Genomics](https://www.wobblegenomics.com/)) for his valuable advices on isoseq analysis
+- The Workpackage 2 of Gene-SWitCH Project for their fruitful discussions and remarks
 - Mick Watson group for their support
 - The nf-core community for their help in the developement of this pipeline
+- Daniel Schreyer for code review
+- James A. Fellows Yates & nf-core for the metro map style components for pipeline graph
 
 This pipeline has been developed as part of the GENE-SWitCH project. This project has received funding from the European Union's Horizon 2020 Research and Innovation Programme under the grant agreement n° 817998.
 
@@ -105,6 +107,7 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 - uLTRA: Kristoffer Sahlin, Veli Mäkinen, Accurate spliced alignment of long RNA sequencing reads, Bioinformatics, Volume 37, Issue 24, 15 December 2021, Pages 4643–4651. [10.1093/bioinformatics/btab540](https://doi.org/10.1093/bioinformatics/btab540)
 - Samtools: Danecek P, Bonfield JK, Liddle J, Marshall J, Ohan V, Pollard MO, Whitwham A, Keane T, McCarthy SA, Davies RM, Li H, Twelve years of SAMtools and BCFtools, GigaScience (2021) 10(2) giab008. [10.1093/gigascience/giab007](https://doi.org/10.1093/gigascience/giab007)
 - MultiQC: Philip Ewels, Måns Magnusson, Sverker Lundin, Max Käller, MultiQC: summarize analysis results for multiple tools and samples in a single report, Bioinformatics, Volume 32, Issue 19, 1 October 2016, Pages 3047–3048. [10.1093/bioinformatics/btw354](https://doi.org/10.1093/bioinformatics/btw354)
+- samtools: Danecek P, Bonfield JK, Liddle J, Marshall J, Ohan V, Pollard MO, Whitwham A, Keane T, McCarthy SA, Davies RM, Li H, Twelve years of SAMtools and BCFtools, GigaScience (2021) 10(2) [10.1093/gigascience/giab008](https://academic.oup.com/gigascience/article/10/2/giab008/6137722?login=false)
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
