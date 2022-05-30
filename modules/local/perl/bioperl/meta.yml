@@ -1,32 +1,27 @@
 name: perl_bioperl
-## TODO nf-core: Add a description of the module and list keywords
-description: write your description here
+
+description: Bioperl module - A sandbox module to run Perl one liner
 keywords:
-  - sort
+  - bioperl
 tools:
   - perl:
-      ## TODO nf-core: Add a description and other details for the software below
-      description: Bioinformatics Toolkit
-      homepage: None
-      documentation: None
-      tool_dev_url: None
+      description: Bioperl module - A sandbox module to run Perl one liner
+      homepage: https://bioperl.org
+      documentation: https://bioperl.org/howtos/index.html
+      tool_dev_url: https://github.com/bioperl
       doi: ""
       licence: ["perl_5"]
 
-## TODO nf-core: Add a description of all of the variables used as input
 input:
   - meta:
       type: map
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  ## TODO nf-core: Delete / customise this example input
-  - bam:
+  - file:
       type: file
-      description: BAM/CRAM/SAM file
-      pattern: "*.{bam,cram,sam}"
+      description: A text file to update with a one liner
 
-## TODO nf-core: Add a description of all of the variables used as output
 output:
   - meta:
       type: map
@@ -37,11 +32,10 @@ output:
       type: file
       description: File containing software version
       pattern: "*.{version.txt}"
-  ## TODO nf-core: Delete / customise this example output
-  - bam:
+
+  - out:
       type: file
-      description: Sorted BAM/CRAM/SAM file
-      pattern: "*.{bam,cram,sam}"
+      description: The updated input file.
 
 authors:
   - "@sguizard"
