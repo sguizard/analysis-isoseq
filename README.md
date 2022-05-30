@@ -43,9 +43,9 @@ On release, automated continuous integration tests run the pipeline on a full-si
 6. uLTRA path: decompress FLNCs ([`GUNZIP`](https://www.gnu.org/software/gzip/))
 7. Map consensuses on the reference genome ([`MINIMAP2`](https://github.com/lh3/minimap2) or [`uLTRA`](https://github.com/ksahlin/ultra))
 8. uLTRA path remove spurious alignments ([`BIOPERL`](https://bioperl.org/))
-8. Sort sam file and convert bam ([`SAMTOOLS SORT`](http://www.htslib.org/doc/samtools-sort.html))
-9. Clean gene models ([`TAMA collapse`](https://github.com/GenomeRIK/tama))
-10. Merge annotations by sample ([`TAMA merge`](https://github.com/GenomeRIK/tama))
+9. Sort sam file and convert bam ([`SAMTOOLS SORT`](http://www.htslib.org/doc/samtools-sort.html))
+10. Clean gene models ([`TAMA collapse`](https://github.com/GenomeRIK/tama))
+11. Merge annotations by sample ([`TAMA merge`](https://github.com/GenomeRIK/tama))
 
 ## Quick Start
 

@@ -11,22 +11,24 @@ This pipeline has been designed to analyse several samples or sequencing runs in
 ### Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use `--input` parameter to specify its location.
+
 ```console
 --input '[path to samplesheet file]'
 ```
 
 The samplesheet is a comma-separated file with 3 columns, and a header row as shown in the examples below.
+
 ```console
 sample,bam,pbi
 sample1,sample1.subreads.bam,sample1.subreads.bam.pbi
 sample2,sample2.subreads.bam,sample2.subreads.bam.pbi
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `sample`  | Custom sample name. Spaces in sample names are automatically converted to underscores (`_`).                                                                             |
-| `bam`     | Full path to isoseq subreads in `bam` format.                                                                                                                            |
-| `pbi`     | Full path to Pacbio index generated with [pbindex](https://github.com/pacificbiosciences/pbbam/). File's name must be compose of bam file name with the `.pbi` extension. |
+| Column   | Description                                                                                                                                                               |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample` | Custom sample name. Spaces in sample names are automatically converted to underscores (`_`).                                                                              |
+| `bam`    | Full path to isoseq subreads in `bam` format.                                                                                                                             |
+| `pbi`    | Full path to Pacbio index generated with [pbindex](https://github.com/pacificbiosciences/pbbam/). File's name must be compose of bam file name with the `.pbi` extension. |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -44,6 +46,7 @@ AAAAAAAAAAAAAAAAAACGCCTGAGA
 ```
 
 Use the --primers option to specify its location.
+
 ```console
 --primers '[path to primers file]'
 ```

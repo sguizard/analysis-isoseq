@@ -114,7 +114,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 [GUNZIP](https://www.gnu.org/software/gzip/) Uncompress FLNCs for their alignment with uLTRA (gzip not handled by uLTRA yet).
 
-
 ### ULTRA or MINIMAP2
 
 <details markdown="1">
@@ -138,7 +137,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 </details>
 
 [BIOPERL](https://bioperl.org/) Some CIGAR string sometimes with a gap (N). This can happen when using GFF file converted to GTF file. See [Issue #11](https://github.com/ksahlin/ultra/issues/11) from uLTRA repo.
-
 
 ### SAMTOOLS SORT
 
