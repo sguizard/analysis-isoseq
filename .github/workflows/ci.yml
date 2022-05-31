@@ -42,7 +42,10 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - name: Run pipeline with test data
+      - name: Run pipeline with test data (uLTRA)
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+
+      - name: Run pipeline with test data (minimap2)
+        run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test_minimap2,docker --outdir ./results
