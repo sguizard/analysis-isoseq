@@ -10,7 +10,7 @@ This pipeline has been designed to analyse several samples or sequencing runs in
 
 ### Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use `--input` parameter to specify its location.
+You will need to create a samplesheet with information about the samples you would like to analyze before running the pipeline. Use `--input` parameter to specify its location.
 
 ```console
 --input '[path to samplesheet file]'
@@ -35,7 +35,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 ### Primer file
 
 The primer files must be in `FASTA` format. The isoseq3 tutorial suggest to trim polyA from primer sequences to address `LIMA` polyA issue.
-However, this will discard a signicant number of valid transcripts. To avoid this drawback, Richard Kuo suggest to conserve primer's polyA strechs, run `LIMA` without `--require-polya` and use TAMA's `tama_flnc_polya_cleanup.py` script. [[twitter thread](https://twitter.com/GenomeRIK/status/1179788262187110401)]
+However, this will discard a significant number of valid transcripts. To avoid this drawback, Richard Kuo suggest to conserve primer's polyA stretches, run `LIMA` without `--require-polya` and use TAMA's `tama_flnc_polya_cleanup.py` script. [[twitter thread](https://twitter.com/GenomeRIK/status/1179788262187110401)]
 
 ```console
 >5p

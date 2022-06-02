@@ -24,13 +24,13 @@
                     "type": "string",
                     "fa_icon": "fas fa-grip-lines",
                     "description": "Fasta file of primers sequences",
-                    "help_text": "The provided file must contains all primers sequences used for sequencing. \n```bash\n--primers primers.fasta\n```"
+                    "help_text": "The provided file must contains all primers sequences used for sequencing. \nGziped files are accepted. "
                 },
                 "gtf": {
                     "type": "string",
                     "fa_icon": "fas fa-stream",
                     "description": "Genome annotation file",
-                    "help_text": "Provide a GTF annotation file (sorted by sequence and start) if you set the `--aligner` option to `uLTRA`"
+                    "help_text": "Provide a GTF annotation file (sorted by sequence and start) if you set the `--aligner` option to `uLTRA`\nGziped files are accepted. "
                 },
                 "outdir": {
                     "type": "string",
@@ -182,7 +182,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs. Gziped files are accepted. ",
                     "fa_icon": "far fa-file-code"
                 },
                 "igenomes_base": {
