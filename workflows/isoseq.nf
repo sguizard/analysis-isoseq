@@ -53,7 +53,6 @@ include { GSTAMA_FILELIST } from '../modules/local/gstama/filelist/main'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-//include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { PBCCS }               from '../modules/nf-core/modules/pbccs/main'
 include { LIMA }                from '../modules/nf-core/modules/lima/main'
 include { ISOSEQ3_REFINE }      from '../modules/nf-core/modules/isoseq3/refine/main'
@@ -117,7 +116,7 @@ workflow ISOSEQ {
         PERL_BIOPERL(ULTRA_PIPELINE.out.sam)                                                    // Remove remove reads ending with GAP (N) in CIGAR string
         // `-> Related to issue https://github.com/ksahlin/ultra/issues/11
         // `-> Maybe should be removed?
-        SAMTOOLS_SORT(PERL_BIOPERL.out.out) // Sort and convert sam to bam
+        SAMTOOLS_SORT(PERL_BIOPERL.out.out)   // Sort and convert sam to bam
     }
     else {
         MINIMAP2_ALIGN(                       // Align read against genome
@@ -129,7 +128,6 @@ workflow ISOSEQ {
         SAMTOOLS_SORT(MINIMAP2_ALIGN.out.bam) // Sort and convert sam to bam
     }
 
-    // SAMTOOLS_SORT(PERL_BIOPERL.out.out)                                // Sort and convert sam to bam
     GSTAMA_COLLAPSE(SAMTOOLS_SORT.out.bam, SET_FASTA_CHANNEL.out.data) // Clean gene models
 
     GSTAMA_COLLAPSE.out.bed // replace id with the former sample id and group files by sample
@@ -190,8 +188,6 @@ workflow ISOSEQ {
     ch_multiqc_files = ch_multiqc_files.mix(PBCCS.out.report_json.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(LIMA.out.summary.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(LIMA.out.counts.collect{it[1]}.ifEmpty([]))
-//  ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-//  ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()
