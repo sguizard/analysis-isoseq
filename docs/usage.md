@@ -51,7 +51,7 @@ Use the --primers option to specify its location.
 --primers '[path to primers file]'
 ```
 
-### Reference Genome and annotation
+### Reference genome and annotation
 
 The reference genome sequence is mandatory and must be in `FASTA` format.
 The reference genome annotation in `GTF` format is required if `uLTRA` aligner is selected.
@@ -59,6 +59,14 @@ The reference genome annotation in `GTF` format is required if `uLTRA` aligner i
 ```console
 --fasta '[path to genome file]'
 --gtf '[path to annotation file]'
+```
+
+### Aligners
+
+Two aligners are available. The `uLTRA` aligner helps to detect small exons with the help of reference genome. However if no annotation is available for your genome you can use minimap2.
+
+```console
+--fasta '[ultra,minimap2]'
 ```
 
 ## Running the pipeline
