@@ -19,7 +19,7 @@
 
 **nf-core/isoseq** is a bioinformatics best-practice analysis pipeline for Isoseq gene annotation with uLTRA and TAMA. Starting from raw isoseq subreads, the pipeline:
 
-- Generates the CCS
+- Generates the Circular Consensus Sequences (CSS)
 
 - Clean and polish CCS to create Full Length Non Chimeric (FLNC) reads
 
@@ -69,7 +69,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 4. Start running your own analysis!
 
    ```console
-   nextflow run nf-core/isoseq --input samplesheet.csv --fasta <GENOME FASTA> --primers <PRIMER FASTA> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run nf-core/isoseq --input samplesheet.csv --outdir <OUTDIR> --genome <GENOME NAME (e.g. GRCh37)> --primers <PRIMER FASTA> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
 ## Documentation
@@ -82,12 +82,12 @@ nf-core/isoseq was originally written by Sébastien Guizard.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-- Richard Kuo ([Wobble Genomics](https://www.wobblegenomics.com/)) for his valuable advices on isoseq analysis
-- The Workpackage 2 of GENE-SWitCH Project for their fruitful discussions and remarks
-- Mick Watson group for their support
+- Thanks to [Jose Espinosa-Carrasco](https://github.com/JoseEspinosa), [Daniel Schreyer](https://github.com/DSchreyer) and [Gisela Gabernet](https://github.com/ggabernet) for their reviews and contributions
+- [Richard Kuo](https://github.com/GenomeRIK) ([Wobble Genomics](https://www.wobblegenomics.com/)) for his valuable advices on isoseq analysis
+- The Workpackage 2 of [GENE-SWitCH Project](https://www.gene-switch.eu/) for their fruitful discussions and remarks
+- [Mick Watson](https://twitter.com/BioMickWatson) group for their support
 - The nf-core community for their help in the development of this pipeline
-- Daniel Schreyer for code reviews
-- James A. Fellows Yates & nf-core for the metro map style components for pipeline graph
+- [James A. Fellows Yates](https://github.com/jfy133) & nf-core for the metro map style components for pipeline graph
 
 This pipeline has been developed as part of the GENE-SWitCH project. This project has received funding from the European Union's Horizon 2020 Research and Innovation Programme under the grant agreement n° 817998.
 

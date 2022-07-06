@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This pipeline has been designed to analyse several samples or sequencing runs in the same time. It reads all samples from a samplesheet file and and parallelize computation for each of them.
+This pipeline has been designed to analyse several samples or sequencing runs at the same time. It reads all samples from a samplesheet file and parallelizes computation for each of them.
 
 ### Samplesheet input
 
@@ -74,7 +74,7 @@ Two aligners are available. The `uLTRA` aligner helps to detect small exons with
 The typical command for running the pipeline is as follows:
 
 ```console
-nextflow run nf-core/isoseq --input samplesheet.csv --primers primers.fasta --fasta Gallus_gallus.GRCg6a.dna.toplevel.fasta -profile singularity
+nextflow run nf-core/isoseq --input samplesheet.csv --outdir <OUTDIR> --primers primers.fasta --fasta Gallus_gallus.GRCg6a.dna.toplevel.fasta -profile singularity
 ```
 
 This will launch the pipeline with the `singularity` configuration profile. See below for more information about profiles.
